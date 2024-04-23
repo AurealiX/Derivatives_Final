@@ -1,6 +1,8 @@
 import yfinance as yf
 import pandas as pd
 
+"""
+
 # Define the ticker symbol and the date range
 
 # Parameters
@@ -42,3 +44,28 @@ print(f'''Parameters:
       - End Date: {end_date}
       - ATR Window: {atr_window} days
       - Window Multiplier: {window_multiplier}''')
+
+
+"""
+
+class ATRB:
+    def __init__(self):
+      pass
+    
+    def process(self, data, atr_win, win_mpl, start_date):
+      # Calculate the True Range (TR)
+      data['High-Low'] = data['High'] - data['Low']
+      data['High-Close'] = abs(data['High'] - data['Close'].shift())
+      data['Low-Close'] = abs(data['Low'] - data['Close'].shift())
+      data['TR'] = data[['High-Low', 'High-Close', 'Low-Close']].max(axis=1)
+
+      # Calculate the ATR
+      data['ATR'] = data['TR'].rolling(window=atr_win).mean()
+      # Calculate the lower bound for the stock every Friday
+      data['Lower_Bound'] = data['Close'] - win_mpl * data['ATR']
+
+      # Filter to get only Fridays
+      friday_data = data[data.index.weekday == 4].reset_index()
+      friday_data = friday_data[friday_data["Date"] >= start_date]
+      friday_data = friday_data[['Date', 'ATR', 'Lower_Bound']]
+      return friday_data
