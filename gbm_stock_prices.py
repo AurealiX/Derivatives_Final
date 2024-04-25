@@ -24,7 +24,11 @@ class GBMPrices:
 
     def simulate_one_path(self, current_end, target_end):
         # Calculate the number of trading days left from end_date to target_end_date
-        sim_days = np.busday_count(current_end, target_end)
+        business_days = pd.date_range(
+            start = current_end, 
+            end = target_end, 
+            freq = 'B').to_numpy()
+        sim_days = len(business_days)
 
         # Calculate the number of hourly steps considering 6.5 trading hours per day
         dt = 1 / (6.5 * 2)  # One hour as a fraction of a trading day
@@ -53,8 +57,8 @@ class GBMPrices:
     def simu_high_low_close(self, current_end, target_end):
         one_path_gbm = self.simulate_one_path(current_end, target_end)
         business_days = pd.date_range(
-            start = (pd.to_datetime(current_end) + np.timedelta64(1,'D')).strftime('%Y-%m-%d'), 
-            end = (pd.to_datetime(target_end) + np.timedelta64(1,'D')).strftime('%Y-%m-%d'), 
+            start = current_end, 
+            end = target_end, 
             freq = 'B').to_numpy()
         day_idx = np.repeat(business_days, int(6.5*2))
         one_path_df = pd.DataFrame(one_path_gbm.T, columns=['Prices'])[1:]

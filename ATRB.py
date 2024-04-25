@@ -57,6 +57,7 @@ class ATRB:
       data['High-Low'] = data['High'] - data['Low']
       data['High-Close'] = abs(data['High'] - data['Close'].shift())
       data['Low-Close'] = abs(data['Low'] - data['Close'].shift())
+      data[['High-Low', 'High-Close', 'Low-Close']] = data[['High-Low', 'High-Close', 'Low-Close']].fillna(0)
       data['TR'] = data[['High-Low', 'High-Close', 'Low-Close']].max(axis=1)
 
       # Calculate the ATR
@@ -65,7 +66,7 @@ class ATRB:
       data['Lower_Bound'] = data['Close'] - win_mpl * data['ATR']
 
       # Filter to get only Fridays
-      friday_data = data[data.index.weekday == 4].reset_index()
-      friday_data = friday_data[friday_data["Date"] >= start_date]
-      friday_data = friday_data[['Date', 'ATR', 'Lower_Bound']]
-      return friday_data
+      # friday_data = data[data.index.weekday == 4].reset_index()
+      # friday_data = friday_data[friday_data["Date"] >= start_date]
+      # friday_data = friday_data[['Date', 'ATR', 'Lower_Bound', 'Close']]
+      return data
